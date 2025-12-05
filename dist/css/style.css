@@ -1,0 +1,88 @@
+dialog{
+  background:#fff;
+  border:solid;
+  color:#000;
+  display:block;
+  height:-webkit-fit-content;
+  height:-moz-fit-content;
+  height:fit-content;
+  left:0;
+  margin:auto;
+  padding:1em;
+  position:absolute;
+  right:0;
+  width:-webkit-fit-content;
+  width:-moz-fit-content;
+  width:fit-content;
+}
+
+dialog:not([open]){
+  display:none;
+}
+
+dialog+.backdrop{
+  background:rgba(0,0,0,.1);
+}
+
+._dialog_overlay,dialog+.backdrop{
+  inset:0;
+  position:fixed;
+}
+
+dialog.fixed{
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+.modal{
+  background-color:rgba(0,0,0,.8);
+  border:none;
+  box-sizing:border-box;
+  height:100vh;
+  height:100dvh;
+  left:0;
+  margin:0;
+  max-height:unset;
+  max-width:unset;
+  padding:0;
+  position:fixed;
+  top:0;
+  width:100%;
+}
+.modal:not([open]){
+  display:none;
+}
+.modal::-ms-backdrop{
+  background:none;
+  pointer-events:none;
+}
+.modal+.backdrop,.modal::backdrop{
+  background:none;
+  pointer-events:none;
+}
+.modal__wrapper{
+  display:grid;
+  height:100%;
+  overflow:auto;
+  padding:15px;
+  pointer-events:none;
+  width:100%;
+}
+.modal__content{
+  align-self:center;
+  background-color:#fff;
+  margin-left:auto;
+  margin-right:auto;
+  max-width:600px;
+  padding:50px;
+  pointer-events:all;
+  position:relative;
+  width:100%;
+}
+.modal__close-button{
+  pointer-events:all;
+  position:absolute;
+  right:10px;
+  top:10px;
+}

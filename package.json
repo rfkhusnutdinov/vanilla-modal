@@ -61,5 +61,8 @@
     "stylelint": "^16.14.1",
     "stylelint-config-recess-order": "^6.0.0",
     "stylelint-config-standard-scss": "^14.0.0"
+  },
+  "dependencies": {
+    "dialog-polyfill": "^0.5.6"
   }
 }
