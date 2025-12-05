@@ -1,20 +1,21 @@
 {
-  "name": "template",
+  "name": "vanilla-modal",
   "version": "1.0.0",
-  "description": "Шаблон для JavaScript проектов",
+  "description": "Простая плагин для создания модальных окон",
   "author": "Rinat Khusnutdinov <rfkhusnutdinov@yandex.ru>",
-  "homepage": "https://github.com/rfkhusnutdinov/template#readme",
+  "homepage": "https://github.com/rfkhusnutdinov/vanilla-modal#readme",
   "bugs": {
-    "url": "https://github.com/rfkhusnutdinov/template/issues"
+    "url": "https://github.com/rfkhusnutdinov/vanilla-modal/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rfkhusnutdinov/template.git"
+    "url": "https://github.com/rfkhusnutdinov/vanilla-modal.git"
   },
   "keywords": [
-    "starter",
-    "javascript",
-    "template"
+    "js",
+    "rollup",
+    "modal",
+    "dialog"
   ],
   "files": [
     "dist",
