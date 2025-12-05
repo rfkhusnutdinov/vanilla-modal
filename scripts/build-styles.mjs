@@ -31,7 +31,7 @@ async function buildStyles(file) {
   const { css } = compile(fullFilePath, {
     sourceMap: !PROD,
     sourceMapIncludeSources: !PROD,
-    style: PROD ? "compressed" : "expanded",
+    style: "expanded",
   });
 
   const basePlugins = [autoprefixer()];
@@ -40,14 +40,31 @@ async function buildStyles(file) {
   const configs = [
     {
       outFile: `${STYLES_DIST_PATH}/${filenameWithoutExt}.css`,
-      plugins: PROD ? [...basePlugins, cssnano()] : basePlugins,
+      plugins: PROD
+        ? [
+            ...basePlugins,
+            cssnano({
+              preset: [
+                "default",
+                {
+                  normalizeWhitespace: false,
+                },
+              ],
+            }),
+          ]
+        : basePlugins,
       label: `${file} (.css)`,
     },
     ...(PROD
       ? [
           {
             outFile: `${STYLES_DIST_PATH}/${filenameWithoutExt}.min.css`,
-            plugins: [...basePlugins, cssnano()],
+            plugins: [
+              ...basePlugins,
+              cssnano({
+                preset: ["default"],
+              }),
+            ],
             label: `${file} (.min.css)`,
           },
         ]

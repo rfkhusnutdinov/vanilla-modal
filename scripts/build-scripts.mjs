@@ -40,6 +40,7 @@ async function buildBundle(input, format, fileName, file, plugins) {
       format,
       dir: SCRIPTS_DIST_PATH,
       entryFileNames: fileName,
+      name: "VanillaModal",
     });
 
     console.log(`✅  Done: ${resolvedFileName}`);
