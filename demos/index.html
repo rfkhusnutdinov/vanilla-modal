@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Демо</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+    </style>
+    <link rel="stylesheet" href="/dist/css/style.css" />
+  </head>
+  <body>
+    <button class="js-modal-trigger" data-target="#modal">Кнопка</button>
+
+    <dialog class="modal js-modal" id="modal">
+      <div class="modal__wrapper">
+        <div class="modal__content">
+          <button class="modal__close-button js-modal-close-button" type="button" aria-label="Закрыть окно">
+            &times;
+          </button>
+          <h2>Заголовок</h2>
+          <p>
+            Далеко-далеко за словесными горами в стране гласных и согласных живут рыбные тексты. За безорфографичный
+            однажды он большой деревни строчка ему алфавит! Буквоград даль грустный последний деревни своего, которой
+            снова прямо своих заголовок?
+          </p>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="/dist/js/index.js"></script>
+    <script>
+      const modal = new VanillaModal({
+        shouldLockBody: true,
+        bodyLockClass: "is-lock",
+        buttonSelector: ".js-modal-trigger",
+        modalSelector: ".js-modal",
+        modalCloseButtonSelector: ".js-modal-close-button",
+        onOpen: (modalEl, triggerButton) => {
+          console.log(modalEl, triggerButton);
+        },
+        onClose: (modalEl) => {
+          console.log(modalEl);
+        },
+      });
+    </script>
+  </body>
+</html>
