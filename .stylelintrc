@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-recess-order"
+  ],
+  "rules": {
+    "color-no-invalid-hex": true,
+    "selector-class-pattern": null,
+    "color-function-notation": "legacy",
+    "no-descending-specificity": null,
+    "property-no-vendor-prefix": null
+  },
+  "ignore": ["comments"]
+}

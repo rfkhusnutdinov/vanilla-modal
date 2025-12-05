@@ -1,0 +1,65 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "Шаблон для JavaScript проектов",
+  "author": "Rinat Khusnutdinov <rfkhusnutdinov@yandex.ru>",
+  "homepage": "https://github.com/rfkhusnutdinov/template#readme",
+  "bugs": {
+    "url": "https://github.com/rfkhusnutdinov/template/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rfkhusnutdinov/template.git"
+  },
+  "keywords": [
+    "starter",
+    "javascript",
+    "template"
+  ],
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dust/js/index.js",
+  "module": "./dist/js/index.esm.js",
+  "license": "MIT",
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "browserslist": [
+    ">0.3%",
+    "defaults",
+    "fully supports es6-module"
+  ],
+  "scripts": {
+    "lint:scripts": "eslint src/**/*.{js,mjs} --fix || true",
+    "lint:styles": "stylelint --fix ./src/**/*.{scss,css}",
+    "lint": "npm run lint:scripts && npm run lint:styles",
+    "build:styles": "node scripts/build-styles.mjs --prod",
+    "build:scripts": "node scripts/build-scripts.mjs --prod",
+    "build": "npm run build:styles && npm run build:scripts",
+    "watch": "node scripts/watch-files.mjs"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.7",
+    "@eslint/js": "^9.19.0",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "autoprefixer": "^10.4.20",
+    "chokidar": "^4.0.3",
+    "cssnano": "^7.0.6",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "postcss": "^8.5.1",
+    "prettier": "^3.4.2",
+    "rollup": "^4.34.0",
+    "sass": "^1.83.4",
+    "stylelint": "^16.14.1",
+    "stylelint-config-recess-order": "^6.0.0",
+    "stylelint-config-standard-scss": "^14.0.0"
+  }
+}
