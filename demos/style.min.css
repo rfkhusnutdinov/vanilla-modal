@@ -1,0 +1,1 @@
+dialog{box-sizing:border-box;left:0;margin:auto;max-height:100%;max-width:100%;padding:0;position:fixed;top:0}dialog:not([open]){display:none}dialog::-ms-backdrop{inset:0;position:fixed}dialog+.backdrop,dialog::backdrop{inset:0;position:fixed}._dialog_overlay{inset:0;position:fixed}
