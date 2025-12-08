@@ -4,42 +4,333 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Демо</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://github.com/rfkhusnutdinov/vanilla-modal/blob/main/dist/css/style.min.css" />
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        display: grid;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: unset;
+        height: 100vh;
+        height: 100dvh;
+        max-height: unset;
+        padding: 15px;
+        margin: 0;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 80%);
+        border: none;
+      }
+
+      .modal::backdrop,
+      .modal + .backdrop {
+        pointer-events: none;
+        background: none;
+      }
+
+      .modal__content {
+        background-color: white;
+        max-width: 600px;
+        width: 100%;
+        padding: 50px;
+        position: relative;
+      }
+
+      .modal__close-button {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        line-height: 32px;
+        vertical-align: middle;
+        background: none;
+        font-size: 32px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .modal__title {
+        margin-bottom: 10px;
+      }
+
+      .modal__text {
+        font-weight: 300;
+      }
     </style>
-    <link rel="stylesheet" href="https://github.com/rfkhusnutdinov/vanilla-modal/tree/main/dist/css/style.css" />
   </head>
   <body>
-    <button class="js-modal-trigger" data-target="#modal">Кнопка</button>
+    <div class="container py-4">
+      <h1 class="mb-4">Vanilla Modal</h1>
+      <p>Лёгкий и настраиваемый плагин для модальных окон на чистом JavaScript с polyfill для нативного dialog.</p>
+      <h2>Особенности</h2>
+      <ul>
+        <li>Минималистичный, без внешних зависимостей кроме `dialog-polyfill`.</li>
+        <li>Адаптивная блокировка скролла страницы при открытом модальном окне.</li>
+        <li>Автоматическое закрытие предыдущего модального окна.</li>
+        <li>События `onOpen` и `onClose` для кастомной логики.</li>
+      </ul>
+      <h2>Установка</h2>
+      <pre
+        class="bg-secondary-subtle p-4"
+      ><code> npm install https://github.com/rfkhusnutdinov/vanilla-modal </code></pre>
+      <h2>Использование в проекте</h2>
+      <p>Минимальный пример работы модального окна с базовой стилизацией</p>
+      <button class="btn btn-primary js-vanilla-modal-trigger" data-target="#modal">
+        Модальное окно без стилизации
+      </button>
+      <br />
+      <br />
+      <pre class="bg-secondary-subtle p-4"><code>&lt;button class="js-vanilla-modal-trigger" data-target="#modal"&gt;
+  Открыть модальное окно
+&lt;/button&gt;
 
-    <dialog class="modal js-modal" id="modal">
-      <div class="modal__wrapper">
-        <div class="modal__content">
-          <button class="modal__close-button js-modal-close-button" type="button" aria-label="Закрыть окно">
-            &times;
-          </button>
-          <h2>Заголовок</h2>
-          <p>
-            Далеко-далеко за словесными горами в стране гласных и согласных живут рыбные тексты. За безорфографичный
-            однажды он большой деревни строчка ему алфавит! Буквоград даль грустный последний деревни своего, которой
-            снова прямо своих заголовок?
-          </p>
-        </div>
+&lt;dialog class="js-vanilla-modal" id="modal" aria-labelledby="modal-title"&gt;
+  &lt;div&gt;
+    &lt;!-- Обязательно добавить этот div чтобы правильно отрабатывало закрытие модального окна при нажатии вне контентной части --&gt;
+    &lt;button class="js-vanilla-modal-close" type="button" aria-label="Закрыть окно"&gt;&amp;times;&lt;/button&gt;
+    &lt;h2 id="modal-title"&gt;Заголовок&lt;/h2&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;</code></pre>
+
+      <pre class="bg-secondary-subtle p-4"><code>
+import VanillaModal from "vanilla-modal";
+import "vanilla-modal/dist/css/style.css";
+
+const modal = new VanillaModal({
+  shouldLockBody: true,
+  bodyLockClass: "is-lock",
+  buttonSelector: ".js-vanilla-modal-trigger",
+  modalSelector: ".js-vanilla-modal",
+  modalCloseElementSelector: ".js-vanilla-modal-close",
+  onOpen: (modalEl, triggerButton) => {
+    console.log(modalEl, triggerButton);
+  },
+  onClose: (modalEl) => {
+    console.log(modalEl);
+  },
+});</code></pre>
+
+      <p>Также можете стилизовать модальное окно под свои потребности, например:</p>
+
+      <button class="btn btn-primary js-vanilla-modal-trigger" data-target="#modal-styled">
+        Модальное окно со стилизацией
+      </button>
+      <br /><br />
+
+      <pre
+        class="bg-secondary-subtle p-4"
+      ><code>&lt;dialog class="modal js-vanilla-modal" id="modal-styled" aria-labelledby="modal-styled-title"&gt;
+  &lt;div class="modal__content"&gt;
+    &lt;button class="modal__close-button js-vanilla-modal-close" type="button" aria-label="Закрыть окно"&gt;
+      &amp;times;
+    &lt;/button&gt;
+    &lt;h2 class="modal__title" id="modal-styled-title"&gt;Модальное окно со стилизацией&lt;/h2&gt;
+    &lt;p&gt;Далеко-далеко за, словесными горами в стране гласных и согласных живут рыбные тексты.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;</code></pre>
+
+      <pre class="bg-secondary-subtle p-4"><code>.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: unset;
+  height: 100vh;
+  height: 100dvh;
+  max-height: unset;
+  padding: 15px;
+  margin: 0;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 80%);
+  border: none;
+}
+
+.modal::backdrop,
+.modal + .backdrop {
+  pointer-events: none;
+  background: none;
+}
+
+.modal__content {
+  background-color: white;
+  max-width: 600px;
+  width: 100%;
+  padding: 50px;
+  position: relative;
+}
+
+.modal__close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  line-height: 32px;
+  vertical-align: middle;
+  background: none;
+  font-size: 32px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal__title {
+  margin-bottom: 10px;
+}
+
+.modal__text {
+  font-weight: 300;
+}</code></pre>
+
+      <h2>Опции</h2>
+
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Опция</th>
+            <th>Тип</th>
+            <th>По умолчанию</th>
+            <th>Описание</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>shouldLockBody</td>
+            <td>boolean</td>
+            <td>true</td>
+            <td>Блокировать скролл страницы при открытой модалке</td>
+          </tr>
+          <tr>
+            <td>bodyLockClass</td>
+            <td>string</td>
+            <td>"is-lock"</td>
+            <td>CSS-класс для body при блокировке</td>
+          </tr>
+          <tr>
+            <td>buttonSelector</td>
+            <td>string</td>
+            <td>".js-vanilla-modal-trigger"</td>
+            <td>Селектор кнопки, открывающей модальное окно</td>
+          </tr>
+          <tr>
+            <td>modalSelector</td>
+            <td>string</td>
+            <td>".js-vanilla-modal"</td>
+            <td>Селектор модального окна</td>
+          </tr>
+          <tr>
+            <td>modalCloseElementSelector</td>
+            <td>string</td>
+            <td>".js-vanilla-modal-close"</td>
+            <td>Селектор элемента закрытия модалки</td>
+          </tr>
+          <tr>
+            <td>closePreviousOnOpen</td>
+            <td>boolean</td>
+            <td>true</td>
+            <td>Закрывать активную модалку при открытии новой</td>
+          </tr>
+          <tr>
+            <td>onOpen</td>
+            <td>function</td>
+            <td>()=&gt;{}</td>
+            <td>Колбэк при открытии: <code>(modalEl, triggerButton) =&gt; {}</code></td>
+          </tr>
+          <tr>
+            <td>onClose</td>
+            <td>function</td>
+            <td>()=&gt;{}</td>
+            <td>Колбэк при закрытии: <code>(modalEl) =&gt; {}</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Методы</h2>
+
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Метод</th>
+            <th>Описание</th>
+            <th>Пример</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>openModal(modalSelector)</code></td>
+            <td>
+              Открывает модальное окно по селектору (селектор с ID модального окна (<code>#myModal</code>) или
+              DOM-элемент модального окна)
+            </td>
+            <td>
+              <code>modal.openModal("#myModal");</code>
+              <code>modal.openModal(document.querySelector("#myModal"));</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>closeModal(modalSelector)</code></td>
+            <td>
+              Закрывает модальное окно по селектору (селектор с ID модального окна (<code>#myModal</code>) или
+              DOM-элемент модального окна)
+            </td>
+            <td>
+              <code>modal.closeModal("#myModal");</code>
+              <code>modal.closeModal(document.querySelector("#myModal"));</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>closeActiveModal()</code></td>
+            <td>Закрывает текущее активное модальное окно</td>
+            <td>
+              <code>modal.closeActiveModal();</code>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <dialog class="js-vanilla-modal" id="modal" aria-labelledby="modal-title">
+      <div>
+        <button class="js-vanilla-modal-close" type="button" aria-label="Закрыть окно">&times;</button>
+        <h2 id="modal-title">Модальное окно без стилизация</h2>
+        <p>Далеко-далеко за словесными горами в стране гласных и согласных живут, рыбные тексты.</p>
       </div>
     </dialog>
 
-    <script src="https://github.com/rfkhusnutdinov/vanilla-modal/tree/main/dist/js/index.js"></script>
+    <dialog class="modal js-vanilla-modal" id="modal-styled" aria-labelledby="modal-styled-title">
+      <div class="modal__content">
+        <button class="modal__close-button js-vanilla-modal-close" type="button" aria-label="Закрыть окно">
+          &times;
+        </button>
+        <h2 class="modal__title" id="modal-styled-title">Модальное окно со стилизацией</h2>
+        <p>Далеко-далеко за, словесными горами в стране гласных и согласных живут рыбные тексты.</p>
+      </div>
+    </dialog>
+
+    <script src="https://github.com/rfkhusnutdinov/vanilla-modal/blob/main/dist/js/index.js"></script>
     <script>
       const modal = new VanillaModal({
         shouldLockBody: true,
         bodyLockClass: "is-lock",
-        buttonSelector: ".js-modal-trigger",
-        modalSelector: ".js-modal",
-        modalCloseButtonSelector: ".js-modal-close-button",
+        buttonSelector: ".js-vanilla-modal-trigger",
+        modalSelector: ".js-vanilla-modal",
+        modalCloseElementSelector: ".js-vanilla-modal-close",
         onOpen: (modalEl, triggerButton) => {
           console.log(modalEl, triggerButton);
         },
