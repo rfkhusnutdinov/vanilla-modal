@@ -5,9 +5,9 @@ class VanillaModal {
     const defaults = {
       shouldLockBody: true,
       bodyLockClass: "is-lock",
-      buttonSelector: ".js-modal-trigger",
-      modalSelector: ".js-modal",
-      modalCloseButtonSelector: ".js-modal-close-button",
+      buttonSelector: ".js-vanilla-modal-trigger",
+      modalSelector: ".js-vanilla-modal",
+      modalCloseElementSelector: ".js-vanilla-modal-close",
       closePreviousOnOpen: true,
       onOpen: (modalEl, triggerButton) => {},
       onClose: (modalEl) => {},
@@ -31,7 +31,7 @@ class VanillaModal {
       const modal = target.closest(this.settings.modalSelector);
       if (!modal) return;
 
-      if (target === modal || target.closest(this.settings.modalCloseButtonSelector)) {
+      if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
         return this.closeModal(modal);
       }
     });
