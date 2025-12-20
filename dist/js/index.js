@@ -921,13 +921,15 @@
       let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       _classPrivateMethodInitSpec(this, _VanillaModal_brand);
       const defaults = {
-        shouldLockBody: true,
-        bodyLockClass: "is-lock",
-        buttonSelector: ".js-vanilla-modal-trigger",
+        triggerSelector: ".js-vanilla-modal-trigger",
+        triggerTargetAttribute: "data-target",
         modalSelector: ".js-vanilla-modal",
         modalCloseElementSelector: ".js-vanilla-modal-close",
+        modalOpenClass: "is-open",
+        disableScroll: true,
         closePreviousOnOpen: true,
-        onOpen: (modalEl, triggerButton) => {},
+        animate: false,
+        onOpen: (modalEl, trigger) => {},
         onClose: modalEl => {}
       };
       this.settings = _objectSpread2(_objectSpread2({}, defaults), options);
@@ -948,7 +950,17 @@
         this.closeActiveModal();
       }
       _assertClassBrand(_VanillaModal_brand, this, _lockBody).call(this);
+      if (!el.__cancelBound) {
+        el.addEventListener("cancel", e => {
+          e.preventDefault();
+          this.closeModal(el);
+        });
+        el.__cancelBound = true;
+      }
       el.showModal();
+      requestAnimationFrame(() => {
+        el.classList.add(this.settings.modalOpenClass);
+      });
       (_this$settings$onOpen = (_this$settings = this.settings).onOpen) === null || _this$settings$onOpen === void 0 || _this$settings$onOpen.call(_this$settings, el, trigger);
     }
     closeModal(modal) {
@@ -958,8 +970,20 @@
         console.warn("Modal not found: ".concat(modal));
         return;
       }
-      _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
-      el.close();
+      el.classList.remove(this.settings.modalOpenClass);
+      if (this.settings.animate) {
+        requestAnimationFrame(() => {
+          el.addEventListener("transitionend", () => {
+            _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
+            el.close();
+          }, {
+            once: true
+          });
+        });
+      } else {
+        _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
+        el.close();
+      }
       (_this$settings$onClos = (_this$settings2 = this.settings).onClose) === null || _this$settings$onClos === void 0 || _this$settings$onClos.call(_this$settings2, el);
     }
     closeActiveModal() {
@@ -972,20 +996,15 @@
   function _init() {
     document.addEventListener("click", e => {
       const target = e.target;
-      const button = target.closest(this.settings.buttonSelector);
-      if (button) {
+      const trigger = target.closest(this.settings.triggerSelector);
+      if (trigger) {
         e.preventDefault();
-        return this.openModal(button.dataset.target, button);
+        return this.openModal(trigger.getAttribute(this.settings.triggerTargetAttribute), trigger);
       }
       const modal = target.closest(this.settings.modalSelector);
       if (!modal) return;
       if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
         return this.closeModal(modal);
-      }
-    });
-    document.addEventListener("keydown", e => {
-      if (e.key == "Escape") {
-        _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
       }
     });
   }
@@ -995,17 +1014,15 @@
     return null;
   }
   function _lockBody() {
-    if (this.settings.shouldLockBody) {
+    if (this.settings.disableScroll) {
       document.body.style.overflow = "hidden";
-      document.body.classList.add(this.settings.bodyLockClass);
     }
   }
   function _unlockBody() {
-    if (this.settings.shouldLockBody) {
+    if (this.settings.disableScroll) {
       requestAnimationFrame(() => {
         if (!document.querySelector("dialog[open]")) {
           document.body.style.overflow = "";
-          document.body.classList.remove(this.settings.bodyLockClass);
         }
       });
     }
