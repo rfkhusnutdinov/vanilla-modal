@@ -3,13 +3,15 @@ import dialogPolyfill from "dialog-polyfill";
 class VanillaModal {
   constructor(options = {}) {
     const defaults = {
-      shouldLockBody: true,
-      bodyLockClass: "is-lock",
-      buttonSelector: ".js-vanilla-modal-trigger",
+      triggerSelector: ".js-vanilla-modal-trigger",
+      triggerTargetAttribute: "data-target",
       modalSelector: ".js-vanilla-modal",
       modalCloseElementSelector: ".js-vanilla-modal-close",
+      modalOpenClass: "is-open",
+      disableScroll: true,
       closePreviousOnOpen: true,
-      onOpen: (modalEl, triggerButton) => {},
+      animate: false,
+      onOpen: (modalEl, trigger) => {},
       onClose: (modalEl) => {},
     };
 
@@ -22,10 +24,10 @@ class VanillaModal {
     document.addEventListener("click", (e) => {
       const target = e.target;
 
-      const button = target.closest(this.settings.buttonSelector);
-      if (button) {
+      const trigger = target.closest(this.settings.triggerSelector);
+      if (trigger) {
         e.preventDefault();
-        return this.openModal(button.dataset.target, button);
+        return this.openModal(trigger.getAttribute(this.settings.triggerTargetAttribute), trigger);
       }
 
       const modal = target.closest(this.settings.modalSelector);
@@ -33,12 +35,6 @@ class VanillaModal {
 
       if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
         return this.closeModal(modal);
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key == "Escape") {
-        this.#unlockBody();
       }
     });
   }
@@ -50,18 +46,16 @@ class VanillaModal {
   }
 
   #lockBody() {
-    if (this.settings.shouldLockBody) {
+    if (this.settings.disableScroll) {
       document.body.style.overflow = "hidden";
-      document.body.classList.add(this.settings.bodyLockClass);
     }
   }
 
   #unlockBody() {
-    if (this.settings.shouldLockBody) {
+    if (this.settings.disableScroll) {
       requestAnimationFrame(() => {
         if (!document.querySelector("dialog[open]")) {
           document.body.style.overflow = "";
-          document.body.classList.remove(this.settings.bodyLockClass);
         }
       });
     }
@@ -83,7 +77,20 @@ class VanillaModal {
     }
 
     this.#lockBody();
+
+    if (!el.__cancelBound) {
+      el.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        this.closeModal(el);
+      });
+      el.__cancelBound = true;
+    }
+
     el.showModal();
+
+    requestAnimationFrame(() => {
+      el.classList.add(this.settings.modalOpenClass);
+    });
 
     this.settings.onOpen?.(el, trigger);
   }
@@ -95,8 +102,23 @@ class VanillaModal {
       return;
     }
 
-    this.#unlockBody();
-    el.close();
+    el.classList.remove(this.settings.modalOpenClass);
+
+    if (this.settings.animate) {
+      requestAnimationFrame(() => {
+        el.addEventListener(
+          "transitionend",
+          () => {
+            this.#unlockBody();
+            el.close();
+          },
+          { once: true },
+        );
+      });
+    } else {
+      this.#unlockBody();
+      el.close();
+    }
 
     this.settings.onClose?.(el);
   }
