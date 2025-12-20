@@ -38,12 +38,15 @@ import VanillaModal from "vanilla-modal";
 import "vanilla-modal/dist/css/style.css";
 
 const modal = new VanillaModal({
-  shouldLockBody: true,
-  bodyLockClass: "is-lock",
-  buttonSelector: ".js-vanilla-modal-trigger",
+  triggerSelector: ".js-vanilla-modal-trigger",
+  triggerTargetAttribute: "data-target",
   modalSelector: ".js-vanilla-modal",
   modalCloseElementSelector: ".js-vanilla-modal-close",
-  onOpen: (modalEl, triggerButton) => {
+  modalOpenClass: "is-open",
+  diableScroll: true,
+  closePreviousOnOpen: true,
+  animate: false,
+  onOpen: (modalEl, trigger) => {
     console.log(modalEl, triggerButton);
   },
   onClose: (modalEl) => {
@@ -70,7 +73,6 @@ const modal = new VanillaModal({
   top: 0;
   left: 0;
   box-sizing: border-box;
-  display: grid;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -81,8 +83,22 @@ const modal = new VanillaModal({
   padding: 15px;
   margin: 0;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 80%);
+  background-color: transparent;
   border: none;
+  transition: background-color 0.3s ease;
+}
+
+.modal.is-open {
+  background-color: rgba(0, 0, 0, 80%);
+}
+
+.modal.is-open .modal__content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal[open] {
+  display: grid;
 }
 
 .modal::backdrop,
@@ -97,6 +113,11 @@ const modal = new VanillaModal({
   width: 100%;
   padding: 50px;
   position: relative;
+  transform: scale(0.9);
+  opacity: 0;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .modal__close-button {
@@ -126,16 +147,18 @@ const modal = new VanillaModal({
 
 При создании нового экземпляра можно передать объект с опциями:
 
-| Опция                     | Тип      | По умолчанию                | Описание                                            |
-| ------------------------- | -------- | --------------------------- | --------------------------------------------------- |
-| shouldLockBody            | boolean  | true                        | Блокировать скролл страницы при открытой модалке    |
-| bodyLockClass             | string   | "is-lock"                   | CSS-класс для body при блокировке                   |
-| buttonSelector            | string   | ".js-vanilla-modal-trigger" | Селектор кнопки, открывающей модальное окно         |
-| modalSelector             | string   | ".js-vanilla-modal"         | Селектор модального окна                            |
-| modalCloseElementSelector | string   | ".js-vanilla-modal-close"   | Селектор элемента закрытия модалки                  |
-| closePreviousOnOpen       | boolean  | true                        | Закрывать активную модалку при открытии новой       |
-| onOpen                    | function | ()=>{}                      | Колбэк при открытии: (modalEl, triggerButton) => {} |
-| onClose                   | function | ()=>{}                      | Колбэк при закрытии: (modalEl) => {}                |
+| Опция                     | Тип      | По умолчанию                | Описание                                              |
+| ------------------------- | -------- | --------------------------- | ----------------------------------------------------- |
+| triggerSelector           | string   | ".js-vanilla-modal-trigger" | Селектор триггера, открывающей модальное окно         |
+| triggerTargetAttribute    | string   | "data-target"               | Атрибут триггера, открывающего модальное окно         |
+| modalSelector             | string   | ".js-vanilla-modal"         | Селектор модального окна                              |
+| modalCloseElementSelector | string   | ".js-vanilla-modal-close"   | Селектор элемента закрытия модального окна            |
+| modalOpenClass            | string   | "is-open"                   | Класс, добавляемый при открытии модального окна       |
+| disableScroll             | boolean  | true                        | Отключить скролл при открытии модального окна         |
+| closePreviousOnOpen       | boolean  | true                        | Закрыть предыдущее модальное окно при открытии нового |
+| animate                   | boolean  | false                       | Анимировать открытие/закрытие модального окна         |
+| onOpen                    | function | ()=>{}                      | Колбэк при открытии: (modalEl, trigger) => {}         |
+| onClose                   | function | ()=>{}                      | Колбэк при закрытии: (modalEl) => {}                  |
 
 ## Методы
 
