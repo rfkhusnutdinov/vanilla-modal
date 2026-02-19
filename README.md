@@ -2,7 +2,7 @@
 
 Лёгкий и настраиваемый плагин для модальных окон на чистом JavaScript. Построен на нативном `<dialog>` с полифилом для старых браузеров.
 
-[Documentation](https://rfkhusnutdinov.github.io/vanilla-modal/docs/)
+[Documentation](https://rfkhusnutdinov.github.io/vanilla-modal/)
 
 - Нативный <dialog> + полифил `dialog-polyfill`.
 - Блокировка скролла страницы
