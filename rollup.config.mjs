@@ -14,7 +14,7 @@ import postcss from "rollup-plugin-postcss";
 const NODE_ENV = process.env.NODE_ENV || "development";
 const PROD = NODE_ENV === "production";
 
-const SCRIPTS_OUTPUT_NAME = "MyLibrary";
+const SCRIPTS_OUTPUT_NAME = "VanillaModal";
 
 const SCRIPTS_SRC_PATH = "src";
 const SCRIPTS_DIST_PATH = "dist";
