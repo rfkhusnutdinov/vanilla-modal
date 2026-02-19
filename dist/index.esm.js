@@ -1,13 +1,3 @@
-function _assertClassBrand(e, t, n) {
-  if ("function" == typeof e ? e === t : e.has(t)) return arguments.length < 3 ? t : n;
-  throw new TypeError("Private element is not present on this object");
-}
-function _checkPrivateRedeclaration(e, t) {
-  if (t.has(e)) throw new TypeError("Cannot initialize the same private elements twice on an object");
-}
-function _classPrivateMethodInitSpec(e, a) {
-  _checkPrivateRedeclaration(e, a), a.add(e);
-}
 function _defineProperty(e, r, t) {
   return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
     value: t,
@@ -909,117 +899,239 @@ if (window.HTMLDialogElement === undefined) {
   HTMLFormElement.prototype.submit = replacementFormSubmit;
 }
 
-var _VanillaModal_brand = /*#__PURE__*/new WeakSet();
 class VanillaModal {
   constructor() {
     let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    _classPrivateMethodInitSpec(this, _VanillaModal_brand);
+    _defineProperty(this, "settings", void 0);
+    _defineProperty(this, "clickHandler", void 0);
+    _defineProperty(this, "keydownHandler", void 0);
+    _defineProperty(this, "optionsCache", new WeakMap());
+    _defineProperty(this, "observers", new Map());
     const defaults = {
-      triggerSelector: ".js-vanilla-modal-trigger",
-      triggerTargetAttribute: "data-target",
-      modalSelector: ".js-vanilla-modal",
-      modalCloseElementSelector: ".js-vanilla-modal-close",
       modalOpenClass: "is-open",
       disableScroll: true,
       closePreviousOnOpen: true,
       animate: false,
-      onOpen: (modalEl, trigger) => {},
-      onClose: modalEl => {}
+      animationTimeout: 300,
+      closeOnEscape: true,
+      closeOnBackdropClick: true,
+      returnFocus: true,
+      type: "dialog",
+      onOpen: () => {},
+      onClose: () => {}
     };
     this.settings = _objectSpread2(_objectSpread2({}, defaults), options);
-    _assertClassBrand(_VanillaModal_brand, this, _init).call(this);
+    this.clickHandler = this.handleClick.bind(this);
+    this.keydownHandler = this.handleKeydown.bind(this);
+    this.init();
   }
-  openModal(modal) {
-    var _this$settings$onOpen, _this$settings;
-    let trigger = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    const el = _assertClassBrand(_VanillaModal_brand, this, _getModal).call(this, modal);
-    if (!el) {
-      console.warn("Modal not found: ".concat(modal));
+  // ─── Инициализация ───────────────────────────────────────────────────────────
+  init() {
+    document.addEventListener("click", this.clickHandler);
+    document.addEventListener("keydown", this.keydownHandler, true);
+  }
+  handleClick(e) {
+    const target = e.target;
+    const opener = target.closest("[data-modal-open]");
+    if (opener) {
+      e.preventDefault();
+      const selector = opener.dataset.modalOpen;
+      if (selector) this.openModal(selector, opener);
       return;
     }
-    if (typeof el.showModal !== "function") {
-      dialogPolyfill.registerDialog(el);
-    }
-    if (this.settings.closePreviousOnOpen) {
-      this.closeActiveModal();
-    }
-    _assertClassBrand(_VanillaModal_brand, this, _lockBody).call(this);
-    if (!el.__cancelBound) {
-      el.addEventListener("cancel", e => {
-        e.preventDefault();
-        this.closeModal(el);
-      });
-      el.__cancelBound = true;
-    }
-    el.showModal();
-    requestAnimationFrame(() => {
-      el.classList.add(this.settings.modalOpenClass);
-    });
-    (_this$settings$onOpen = (_this$settings = this.settings).onOpen) === null || _this$settings$onOpen === void 0 || _this$settings$onOpen.call(_this$settings, el, trigger);
-  }
-  closeModal(modal) {
-    var _this$settings$onClos, _this$settings2;
-    const el = _assertClassBrand(_VanillaModal_brand, this, _getModal).call(this, modal);
-    if (!el) {
-      console.warn("Modal not found: ".concat(modal));
+    const toggler = target.closest("[data-modal-toggle]");
+    if (toggler) {
+      e.preventDefault();
+      const selector = toggler.dataset.modalToggle;
+      if (selector) this.toggle(selector, toggler);
       return;
     }
-    el.classList.remove(this.settings.modalOpenClass);
-    if (this.settings.animate) {
-      requestAnimationFrame(() => {
-        el.addEventListener("transitionend", () => {
-          _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
-          el.close();
-        }, {
-          once: true
-        });
-      });
-    } else {
-      _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
-      el.close();
+    const modal = target.closest("dialog");
+    if (!modal) return;
+    const options = this.getModalOptions(modal);
+    const isCloseButton = !!target.closest("[data-modal-close]");
+    const isBackdropClick = options.closeOnBackdropClick && target === modal;
+    if (isCloseButton || isBackdropClick) {
+      this.closeModal(modal);
     }
-    (_this$settings$onClos = (_this$settings2 = this.settings).onClose) === null || _this$settings$onClos === void 0 || _this$settings$onClos.call(_this$settings2, el);
   }
-  closeActiveModal() {
-    const activeModal = document.querySelector("dialog[open]");
-    if (activeModal) {
+  handleKeydown(e) {
+    if (e.key !== "Escape") return;
+    const activeModal = this.openModals.at(-1);
+    if (!activeModal) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const options = this.getModalOptions(activeModal);
+    if (options.closeOnEscape) {
       this.closeModal(activeModal);
     }
   }
-}
-function _init() {
-  document.addEventListener("click", e => {
-    const target = e.target;
-    const trigger = target.closest(this.settings.triggerSelector);
-    if (trigger) {
-      e.preventDefault();
-      return this.openModal(trigger.getAttribute(this.settings.triggerTargetAttribute), trigger);
-    }
-    const modal = target.closest(this.settings.modalSelector);
-    if (!modal) return;
-    if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
-      return this.closeModal(modal);
-    }
-  });
-}
-function _getModal(modal) {
-  if (modal instanceof Element) return modal;
-  if (typeof modal === "string") return document.querySelector(modal);
-  return null;
-}
-function _lockBody() {
-  if (this.settings.disableScroll) {
-    document.body.style.overflow = "hidden";
+  // ─── Вспомогательные ─────────────────────────────────────────────────────────
+  getModal(modal) {
+    if (modal instanceof HTMLDialogElement) return modal;
+    if (typeof modal === "string") return document.querySelector(modal);
+    return null;
   }
-}
-function _unlockBody() {
-  if (this.settings.disableScroll) {
-    requestAnimationFrame(() => {
-      if (!document.querySelector("dialog[open]")) {
-        document.body.style.overflow = "";
-      }
+  lockBody(disableScroll) {
+    if (disableScroll) {
+      document.body.style.overflow = "hidden";
+    }
+  }
+  unlockBody(disableScroll) {
+    if (disableScroll) {
+      requestAnimationFrame(() => {
+        if (this.openModals.length === 0) {
+          document.body.style.overflow = "";
+        }
+      });
+    }
+  }
+  dispatch(el, eventName, detail) {
+    el.dispatchEvent(new CustomEvent(eventName, {
+      bubbles: true,
+      cancelable: true,
+      detail
+    }));
+  }
+  closeWithAnimation(el, options, onFinish) {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      this.unlockBody(options.disableScroll);
+      el.close();
+      onFinish === null || onFinish === void 0 || onFinish();
+    };
+    el.addEventListener("transitionend", finish, {
+      once: true
     });
+    el.addEventListener("animationend", finish, {
+      once: true
+    });
+    const timer = setTimeout(finish, options.animationTimeout);
+  }
+  observeModalOptions(el) {
+    if (this.observers.has(el)) return;
+    const observer = new MutationObserver(() => {
+      this.optionsCache.delete(el);
+    });
+    this.observers.set(el, observer);
+    observer.observe(el, {
+      attributes: true,
+      attributeFilter: ["data-modal-animate", "data-modal-animation-timeout", "data-modal-no-escape", "data-modal-no-backdrop-close", "data-modal-no-scroll-lock", "data-modal-no-return-focus", "data-modal-type"]
+    });
+  }
+  getModalOptions(el) {
+    const cached = this.optionsCache.get(el);
+    if (cached) return cached;
+    this.observeModalOptions(el);
+    const d = el.dataset;
+    const options = _objectSpread2(_objectSpread2({}, this.settings), {}, {
+      animate: "modalAnimate" in d ? true : this.settings.animate,
+      animationTimeout: "modalAnimationTimeout" in d ? Number(d.modalAnimationTimeout) || this.settings.animationTimeout : this.settings.animationTimeout,
+      closeOnEscape: "modalNoEscape" in d ? false : this.settings.closeOnEscape,
+      closeOnBackdropClick: "modalNoBackdropClose" in d ? false : this.settings.closeOnBackdropClick,
+      disableScroll: "modalNoScrollLock" in d ? false : this.settings.disableScroll,
+      returnFocus: "modalNoReturnFocus" in d ? false : this.settings.returnFocus,
+      type: "modalType" in d ? d.modalType === "dialog" ? "dialog" : "panel" : this.settings.type
+    });
+    this.optionsCache.set(el, options);
+    return options;
+  }
+  // ─── Публичное API ───────────────────────────────────────────────────────────
+  get openModals() {
+    return [...document.querySelectorAll("dialog[open]")];
+  }
+  openModal(modal) {
+    let trigger = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    const el = this.getModal(modal);
+    if (!el) {
+      console.warn("[VanillaModal] Modal not found:", modal);
+      return;
+    }
+    if (el.open) return;
+    if (typeof el.showModal !== "function") {
+      dialogPolyfill.registerDialog(el);
+    }
+    const options = this.getModalOptions(el);
+    if (options.closePreviousOnOpen) {
+      this.closeActiveModal();
+    }
+    el.__trigger = trigger;
+    if (!el.__cancelBound) {
+      el.addEventListener("cancel", e => {
+        e.preventDefault();
+      });
+      el.__cancelBound = true;
+    }
+    this.lockBody(options.disableScroll);
+    const isBlocking = !options.type || options.type === "dialog";
+    if (isBlocking) {
+      el.showModal();
+    } else {
+      el.show();
+    }
+    void el.offsetHeight;
+    requestAnimationFrame(() => {
+      el.classList.add(options.modalOpenClass);
+    });
+    this.dispatch(el, "modal:open", {
+      trigger
+    });
+    this.settings.onOpen(el, trigger);
+  }
+  closeModal(modal) {
+    var _el$__trigger;
+    const el = this.getModal(modal);
+    if (!el) {
+      console.warn("[VanillaModal] Modal not found:", modal);
+      return;
+    }
+    if (!el.open) return;
+    const trigger = (_el$__trigger = el.__trigger) !== null && _el$__trigger !== void 0 ? _el$__trigger : null;
+    const options = this.getModalOptions(el);
+    el.classList.remove(options.modalOpenClass);
+    const returnFocusToTrigger = () => {
+      if (options.returnFocus && el.__trigger instanceof HTMLElement) {
+        el.__trigger.focus();
+        el.__trigger = null;
+      }
+    };
+    if (options.animate) {
+      this.closeWithAnimation(el, options, returnFocusToTrigger);
+    } else {
+      this.unlockBody(options.disableScroll);
+      el.close();
+      returnFocusToTrigger();
+    }
+    this.dispatch(el, "modal:close", {
+      trigger
+    });
+    this.settings.onClose(el, trigger);
+  }
+  closeActiveModal() {
+    const active = this.openModals.at(-1);
+    if (active) this.closeModal(active);
+  }
+  toggle(modal) {
+    let trigger = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    const el = this.getModal(modal);
+    if (!el) return;
+    el.open ? this.closeModal(el) : this.openModal(el, trigger);
+  }
+  isOpen(modal) {
+    const el = this.getModal(modal);
+    if (!el) return false;
+    return el.open;
+  }
+  destroy() {
+    this.openModals.forEach(el => this.closeModal(el));
+    this.observers.forEach(o => o.disconnect());
+    document.removeEventListener("click", this.clickHandler);
+    document.removeEventListener("keydown", this.keydownHandler, true);
+    this.unlockBody(this.settings.disableScroll);
   }
 }
 
-export { VanillaModal as default };
+export { VanillaModal };

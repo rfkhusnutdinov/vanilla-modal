@@ -1,0 +1,24 @@
+dialog {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  margin: 0;
+}
+dialog:not([open]) {
+  display: none;
+}
+dialog::-ms-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+dialog::backdrop, dialog + .backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+._dialog_overlay {
+  position: fixed;
+  inset: 0;
+}
