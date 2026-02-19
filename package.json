@@ -1,6 +1,6 @@
 {
   "name": "vanilla-modal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Простая плагин для создания модальных окон",
   "author": "Rinat Khusnutdinov <rfkhusnutdinov@yandex.ru>",
   "homepage": "https://github.com/rfkhusnutdinov/vanilla-modal#readme",
@@ -21,8 +21,10 @@
     "dist",
     "src"
   ],
-  "main": "./dust/js/index.js",
-  "module": "./dist/js/index.esm.js",
+  "main": "dust/index.js",
+  "module": "dist/index.esm.js",
+  "jsdelivr": "dist/index.min.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "babel": {
     "presets": [
@@ -38,10 +40,9 @@
     "lint:scripts": "eslint src/**/*.{js,mjs} --fix || true",
     "lint:styles": "stylelint --fix ./src/**/*.{scss,css}",
     "lint": "npm run lint:scripts && npm run lint:styles",
-    "build:styles": "node scripts/build-styles.mjs --prod",
-    "build:scripts": "node scripts/build-scripts.mjs --prod",
-    "build": "npm run build:styles && npm run build:scripts",
-    "watch": "node scripts/watch-files.mjs"
+    "clean": "rimraf dist",
+    "build": "npm run clean && cross-env NODE_ENV=production rollup -c",
+    "dev": "npm run clean && cross-env NODE_ENV=development rollup -c -w"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.7",
@@ -50,20 +51,37 @@
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
     "autoprefixer": "^10.4.20",
     "chokidar": "^4.0.3",
-    "cssnano": "^7.0.6",
+    "cross-env": "^10.1.0",
     "eslint": "^9.19.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^15.14.0",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",
+    "rimraf": "^6.1.2",
     "rollup": "^4.34.0",
+    "rollup-plugin-dts": "^6.3.0",
+    "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.83.4",
     "stylelint": "^16.14.1",
     "stylelint-config-recess-order": "^6.0.0",
-    "stylelint-config-standard-scss": "^14.0.0"
+    "stylelint-config-standard-scss": "^14.0.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "dialog-polyfill": "^0.5.6"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./css": "./dist/index.min.css",
+    "./package.json": "./package.json"
   }
 }

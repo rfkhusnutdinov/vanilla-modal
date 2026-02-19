@@ -1,8 +1,27 @@
 import dialogPolyfill from "dialog-polyfill";
 
-class VanillaModal {
-  constructor(options = {}) {
-    const defaults = {
+interface VanillaModalOptions {
+  triggerSelector?: string;
+  triggerTargetAttribute?: string;
+  modalSelector?: string;
+  modalCloseElementSelector?: string;
+  modalOpenClass?: string;
+  disableScroll?: boolean;
+  closePreviousOnOpen?: boolean;
+  animate?: boolean;
+  onOpen?: (modalEl: HTMLDialogElement, trigger: Element | null) => void;
+  onClose?: (modalEl: HTMLDialogElement) => void;
+}
+
+interface DialogElementExtended extends HTMLDialogElement {
+  __cancelBound?: boolean;
+}
+
+export class VanillaModal {
+  private settings: Required<VanillaModalOptions>;
+
+  constructor(options: VanillaModalOptions = {}) {
+    const defaults: Required<VanillaModalOptions> = {
       triggerSelector: ".js-vanilla-modal-trigger",
       triggerTargetAttribute: "data-target",
       modalSelector: ".js-vanilla-modal",
@@ -11,20 +30,18 @@ class VanillaModal {
       disableScroll: true,
       closePreviousOnOpen: true,
       animate: false,
-      onOpen: (modalEl, trigger) => {},
-      onClose: (modalEl) => {},
+      onOpen: (_modalEl: HTMLDialogElement, _trigger: Element | null) => {},
+      onClose: (_modalEl: HTMLDialogElement) => {},
     };
-
     this.settings = { ...defaults, ...options };
-
-    this.#init();
+    this.init();
   }
 
-  #init() {
-    document.addEventListener("click", (e) => {
-      const target = e.target;
-
+  private init(): void {
+    document.addEventListener("click", (e: PointerEvent) => {
+      const target = e.target as Element;
       const trigger = target.closest(this.settings.triggerSelector);
+
       if (trigger) {
         e.preventDefault();
         return this.openModal(trigger.getAttribute(this.settings.triggerTargetAttribute), trigger);
@@ -34,24 +51,24 @@ class VanillaModal {
       if (!modal) return;
 
       if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
-        return this.closeModal(modal);
+        return this.closeModal(modal as HTMLDialogElement);
       }
     });
   }
 
-  #getModal(modal) {
-    if (modal instanceof Element) return modal;
-    if (typeof modal === "string") return document.querySelector(modal);
+  private getModal(modal: Element | string | null): DialogElementExtended | null {
+    if (modal instanceof Element) return modal as DialogElementExtended;
+    if (typeof modal === "string") return document.querySelector<DialogElementExtended>(modal);
     return null;
   }
 
-  #lockBody() {
+  private lockBody(): void {
     if (this.settings.disableScroll) {
       document.body.style.overflow = "hidden";
     }
   }
 
-  #unlockBody() {
+  private unlockBody(): void {
     if (this.settings.disableScroll) {
       requestAnimationFrame(() => {
         if (!document.querySelector("dialog[open]")) {
@@ -61,8 +78,8 @@ class VanillaModal {
     }
   }
 
-  openModal(modal, trigger = null) {
-    const el = this.#getModal(modal);
+  openModal(modal: Element | string | null, trigger: Element | null = null): void {
+    const el = this.getModal(modal);
     if (!el) {
       console.warn(`Modal not found: ${modal}`);
       return;
@@ -76,10 +93,10 @@ class VanillaModal {
       this.closeActiveModal();
     }
 
-    this.#lockBody();
+    this.lockBody();
 
     if (!el.__cancelBound) {
-      el.addEventListener("cancel", (e) => {
+      el.addEventListener("cancel", (e: Event) => {
         e.preventDefault();
         this.closeModal(el);
       });
@@ -95,8 +112,8 @@ class VanillaModal {
     this.settings.onOpen?.(el, trigger);
   }
 
-  closeModal(modal) {
-    const el = this.#getModal(modal);
+  closeModal(modal: Element | string): void {
+    const el = this.getModal(modal);
     if (!el) {
       console.warn(`Modal not found: ${modal}`);
       return;
@@ -109,27 +126,24 @@ class VanillaModal {
         el.addEventListener(
           "transitionend",
           () => {
-            this.#unlockBody();
+            this.unlockBody();
             el.close();
           },
           { once: true },
         );
       });
     } else {
-      this.#unlockBody();
+      this.unlockBody();
       el.close();
     }
 
     this.settings.onClose?.(el);
   }
 
-  closeActiveModal() {
-    const activeModal = document.querySelector("dialog[open]");
-
+  closeActiveModal(): void {
+    const activeModal = document.querySelector<HTMLDialogElement>("dialog[open]");
     if (activeModal) {
       this.closeModal(activeModal);
     }
   }
 }
-
-export default VanillaModal;

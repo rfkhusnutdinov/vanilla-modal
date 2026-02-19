@@ -1,13 +1,3 @@
-function _assertClassBrand(e, t, n) {
-  if ("function" == typeof e ? e === t : e.has(t)) return arguments.length < 3 ? t : n;
-  throw new TypeError("Private element is not present on this object");
-}
-function _checkPrivateRedeclaration(e, t) {
-  if (t.has(e)) throw new TypeError("Cannot initialize the same private elements twice on an object");
-}
-function _classPrivateMethodInitSpec(e, a) {
-  _checkPrivateRedeclaration(e, a), a.add(e);
-}
 function _defineProperty(e, r, t) {
   return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
     value: t,
@@ -909,11 +899,9 @@ if (window.HTMLDialogElement === undefined) {
   HTMLFormElement.prototype.submit = replacementFormSubmit;
 }
 
-var _VanillaModal_brand = /*#__PURE__*/new WeakSet();
 class VanillaModal {
   constructor() {
     let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    _classPrivateMethodInitSpec(this, _VanillaModal_brand);
     const defaults = {
       triggerSelector: ".js-vanilla-modal-trigger",
       triggerTargetAttribute: "data-target",
@@ -923,16 +911,50 @@ class VanillaModal {
       disableScroll: true,
       closePreviousOnOpen: true,
       animate: false,
-      onOpen: (modalEl, trigger) => {},
-      onClose: modalEl => {}
+      onOpen: (_modalEl, _trigger) => {},
+      onClose: _modalEl => {}
     };
     this.settings = _objectSpread2(_objectSpread2({}, defaults), options);
-    _assertClassBrand(_VanillaModal_brand, this, _init).call(this);
+    this.init();
+  }
+  init() {
+    document.addEventListener("click", e => {
+      const target = e.target;
+      const trigger = target.closest(this.settings.triggerSelector);
+      if (trigger) {
+        e.preventDefault();
+        return this.openModal(trigger.getAttribute(this.settings.triggerTargetAttribute), trigger);
+      }
+      const modal = target.closest(this.settings.modalSelector);
+      if (!modal) return;
+      if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
+        return this.closeModal(modal);
+      }
+    });
+  }
+  getModal(modal) {
+    if (modal instanceof Element) return modal;
+    if (typeof modal === "string") return document.querySelector(modal);
+    return null;
+  }
+  lockBody() {
+    if (this.settings.disableScroll) {
+      document.body.style.overflow = "hidden";
+    }
+  }
+  unlockBody() {
+    if (this.settings.disableScroll) {
+      requestAnimationFrame(() => {
+        if (!document.querySelector("dialog[open]")) {
+          document.body.style.overflow = "";
+        }
+      });
+    }
   }
   openModal(modal) {
-    var _this$settings$onOpen, _this$settings;
     let trigger = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    const el = _assertClassBrand(_VanillaModal_brand, this, _getModal).call(this, modal);
+    var _a, _b;
+    const el = this.getModal(modal);
     if (!el) {
       console.warn("Modal not found: ".concat(modal));
       return;
@@ -943,7 +965,7 @@ class VanillaModal {
     if (this.settings.closePreviousOnOpen) {
       this.closeActiveModal();
     }
-    _assertClassBrand(_VanillaModal_brand, this, _lockBody).call(this);
+    this.lockBody();
     if (!el.__cancelBound) {
       el.addEventListener("cancel", e => {
         e.preventDefault();
@@ -955,11 +977,11 @@ class VanillaModal {
     requestAnimationFrame(() => {
       el.classList.add(this.settings.modalOpenClass);
     });
-    (_this$settings$onOpen = (_this$settings = this.settings).onOpen) === null || _this$settings$onOpen === void 0 || _this$settings$onOpen.call(_this$settings, el, trigger);
+    (_b = (_a = this.settings).onOpen) === null || _b === void 0 ? void 0 : _b.call(_a, el, trigger);
   }
   closeModal(modal) {
-    var _this$settings$onClos, _this$settings2;
-    const el = _assertClassBrand(_VanillaModal_brand, this, _getModal).call(this, modal);
+    var _a, _b;
+    const el = this.getModal(modal);
     if (!el) {
       console.warn("Modal not found: ".concat(modal));
       return;
@@ -968,17 +990,17 @@ class VanillaModal {
     if (this.settings.animate) {
       requestAnimationFrame(() => {
         el.addEventListener("transitionend", () => {
-          _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
+          this.unlockBody();
           el.close();
         }, {
           once: true
         });
       });
     } else {
-      _assertClassBrand(_VanillaModal_brand, this, _unlockBody).call(this);
+      this.unlockBody();
       el.close();
     }
-    (_this$settings$onClos = (_this$settings2 = this.settings).onClose) === null || _this$settings$onClos === void 0 || _this$settings$onClos.call(_this$settings2, el);
+    (_b = (_a = this.settings).onClose) === null || _b === void 0 ? void 0 : _b.call(_a, el);
   }
   closeActiveModal() {
     const activeModal = document.querySelector("dialog[open]");
@@ -987,39 +1009,5 @@ class VanillaModal {
     }
   }
 }
-function _init() {
-  document.addEventListener("click", e => {
-    const target = e.target;
-    const trigger = target.closest(this.settings.triggerSelector);
-    if (trigger) {
-      e.preventDefault();
-      return this.openModal(trigger.getAttribute(this.settings.triggerTargetAttribute), trigger);
-    }
-    const modal = target.closest(this.settings.modalSelector);
-    if (!modal) return;
-    if (target === modal || target.closest(this.settings.modalCloseElementSelector)) {
-      return this.closeModal(modal);
-    }
-  });
-}
-function _getModal(modal) {
-  if (modal instanceof Element) return modal;
-  if (typeof modal === "string") return document.querySelector(modal);
-  return null;
-}
-function _lockBody() {
-  if (this.settings.disableScroll) {
-    document.body.style.overflow = "hidden";
-  }
-}
-function _unlockBody() {
-  if (this.settings.disableScroll) {
-    requestAnimationFrame(() => {
-      if (!document.querySelector("dialog[open]")) {
-        document.body.style.overflow = "";
-      }
-    });
-  }
-}
 
-export { VanillaModal as default };
+export { VanillaModal };
