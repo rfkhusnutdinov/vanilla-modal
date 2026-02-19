@@ -2,6 +2,8 @@
 
 Лёгкий и настраиваемый плагин для модальных окон на чистом JavaScript. Построен на нативном `<dialog>` с полифилом для старых браузеров.
 
+[Documentation](https://rfkhusnutdinov.github.io/vanilla-modal/docs/)
+
 - Нативный <dialog> + полифил `dialog-polyfill`.
 - Блокировка скролла страницы
 - Возврат фокуса на триггер
@@ -25,6 +27,9 @@ npm install https://github.com/rfkhusnutdinov/vanilla-modal
 
 ```js
 import { VanillaModal } from "vanilla-modal";
+
+// Сброс стилей для dialog
+import "vanilla-modal/css";
 
 const modal = new VanillaModal({
   modalOpenClass: "is-open",
@@ -536,6 +541,9 @@ el.addEventListener("modal:close", (e) => {
 ```
 
 ```js
+import { VanillaModal } from "vanilla-modal";
+import "vanilla-modal/css";
+
 const modal = new VanillaModal({
   onOpen: (el, trigger) => console.log("Открыто:", el.id),
   onClose: (el) => console.log("Закрыто:", el.id),
@@ -559,4 +567,4 @@ const modal = new VanillaModal({
 > **Кеш настроек** хранится в `WeakMap` и инвалидируется автоматически через `MutationObserver` при изменении data-атрибутов на диалоге.
 
 > [!NOTE]
-> **Полифил** dialog-polyfill применяется автоматически, если браузер не поддерживает нативный `<dialog>`.
+> **Полифил** `dialog-polyfill` применяется автоматически, если браузер не поддерживает нативный `<dialog>`.
