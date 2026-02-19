@@ -17,7 +17,7 @@ const PROD = NODE_ENV === "production";
 const SCRIPTS_OUTPUT_NAME = "MyLibrary";
 
 const SCRIPTS_SRC_PATH = "src";
-const SCRIPTS_DIST_PATH = "dist/js";
+const SCRIPTS_DIST_PATH = "dist";
 const SCRIPTS_FILES = ["index.ts"];
 
 const STYLES_DIST_PATH = "dist";
